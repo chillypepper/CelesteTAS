@@ -25,6 +25,7 @@ namespace CelesteStudio {
 		private int totalFrames = 0, currentFrame = 0;
 		private bool updating = false;
 		private DateTime lastChanged = DateTime.MinValue;
+		private Entities.FileVerifier fileVerifier = null;
 		public Studio() {
 			InitializeComponent();
 			Text = titleBarText;
@@ -33,6 +34,7 @@ namespace CelesteStudio {
 			Lines.Add(new InputRecord(""));
 			EnableStudio(false);
 
+			fileVerifier = new FileVerifier(tasText);
 			DesktopLocation = new Point(RegRead("x", DesktopLocation.X), RegRead("y", DesktopLocation.Y));
 			Size = new Size(RegRead("w", Size.Width), RegRead("h", Size.Height));
 		}
@@ -56,6 +58,13 @@ namespace CelesteStudio {
 					tasText.OpenFile();
 				} else if (e.Modifiers == Keys.Control && e.KeyCode == Keys.K) {
 					CommentText();
+				} else if (e.Modifiers == Keys.Control && e.KeyCode == Keys.B) {
+					// Begin the file verification
+					fileVerifier.BeginVerifyingFile();
+				} else if (e.Modifiers == Keys.Control && e.KeyCode == Keys.P) {
+					// End the file verification and save the final verified file
+					fileVerifier.EndVerifyingFile();
+					tasText.SaveFile();
 				}
 			} catch (Exception ex) {
 				MessageBox.Show(this, ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -185,6 +194,9 @@ namespace CelesteStudio {
 							tasText.CurrentLineText = num;
 						}
 					}
+
+					// Check for fileverifier updates, which will update the file data if it's running
+					fileVerifier.UpdateValues(memory);
 				} else {
 					currentFrame = 0;
 					if (tasText.CurrentLine >= 0) {

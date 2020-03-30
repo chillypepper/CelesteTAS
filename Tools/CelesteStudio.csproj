@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\FileVerifier.cs" />
     <Compile Include="Entities\GameMemory.cs" />
     <Compile Include="Entities\MemoryReader.cs" />
     <Compile Include="Entities\InputRecord.cs" />
