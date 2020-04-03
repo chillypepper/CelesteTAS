@@ -73,8 +73,6 @@ namespace CelesteStudio.Entities
 
                         tasLines[0].Notes = verificationLine;
                         tasLines[tasLines.Count - 1].Notes = verificationLine;
-
-                        UpdateFileText(false);
                     }
                     else if (currentLineFrame == "0" || (!string.IsNullOrWhiteSpace(time) && time != previousTime && currentLineFrame == "1"))
                     {
@@ -104,8 +102,6 @@ namespace CelesteStudio.Entities
                                     break;
                                 }
                             }
-
-                            UpdateFileText(false);
                         }
 
                         // currentLineFrame 0 is a special case - when coming from a level exit at the start of a file, it hangs for a while as frame 0, so make sure it only happens once
@@ -208,9 +204,16 @@ namespace CelesteStudio.Entities
                     // If we're on an action line then add it if it's new, or update the previous line if it's a duplicate
                     totalFrames += currentLine.Frames;
 
-                    if (lastLine.Frames != 0 && currentLine.ActionsToString() == lastLine.ActionsToString())
+                    if (lastLine.Frames != 0 &&
+                        currentLine.ActionsToString() == lastLine.ActionsToString() &&
+                        (!currentLine.HasActions(Actions.Feather) || currentLine.Angle == lastLine.Angle)
+                    )
                     {
                         lastLine.Frames += currentLine.Frames;
+                    }
+                    else if (currentLine.HasActions(Actions.Feather))
+                    {
+                        tasLines.Add(new InputRecord(currentLine.Frames + ",F," + currentLine.Angle));
                     }
                     else
                     {
